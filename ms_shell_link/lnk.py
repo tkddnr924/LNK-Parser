@@ -28,18 +28,18 @@ class LNKStructure:
         self._parse()
 
     def get_notion_data(self):
-        header = ShellLinkHeader.notionable(self.header)
-        id_list = LinkTargetIDList.notionable(self.link_target_id_list)
-        link_info = LinkInfo.notionable(self.link_info)
-        string_data = StringData.notionable(self.string_data)
-        ex_data = ExtraData.notionable(self.extra_data)
+        h  = getattr(self, 'header', None)
+        lt = getattr(self, 'link_target_id_list', None)
+        li = getattr(self, 'link_info', None)
+        sd = getattr(self, 'string_data', None)
+        ed = getattr(self, 'extra_data', None)
 
         return {
-            "ShellLinkHeader": header,
-            "LinkTargetIDList": id_list,
-            "LinkInfo": link_info,
-            "StringData": string_data,
-            "ExtraData": ex_data,
+            "ShellLinkHeader": ShellLinkHeader.notionable(h) if h else None,
+            "LinkTargetIDList": LinkTargetIDList.notionable(lt) if lt else None,
+            "LinkInfo": LinkInfo.notionable(li) if li else None,
+            "StringData": StringData.notionable(sd) if sd else None,
+            "ExtraData": ExtraData.notionable(ed) if ed else None,
         }
 
 

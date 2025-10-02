@@ -34,3 +34,5 @@ def read_guid(b: bytes, off: int = 0) -> Optional[str]:
     d4 = b[off+8:off+10]  # 2 bytes
     d5 = b[off+10:off+16] # 6 bytes
     return f"{d1:08X}-{d2:04X}-{d3:04X}-{d4.hex().upper()}-{d5.hex().upper()}"
+
+def _empty(x): return '' if x in (None, '', [], {}, ()) else x

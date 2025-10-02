@@ -8,7 +8,10 @@ class BaseStringData:
         self._set_readable()
 
     def _set_readable(self):
-        self.readable = self.raw_bytes.decode('utf-16').strip('\x00')
+        try:
+            self.readable = self.raw_bytes.decode('utf-16').strip('\x00')
+        except:
+            self.readable = self.raw_bytes.decode('utf-8').strip('\x00')
         self.readable = self.readable.split('\x00')[0]
 
     def __repr__(self):
@@ -59,10 +62,20 @@ class StringData:
 
     @staticmethod
     def notionable(data):
+        def get(d, field):
+            if d is None:
+                return ""
+            obj = getattr(d, field, None)
+            if obj is None:
+                return ""
+            val = getattr(obj, "readable", obj)
+            return "" if val in (None, "", [], {}, ()) else val
+
         return {
-            "NameString": data.name_string,
-            "RELATIVE_PATH": data.relative_path.readable,
-            "WORKING_DIR": data.working_dir.readable if data.working_dir else "",
-            "COMMAND_LINE_ARGUMENTS": data.command_line_arguments.readable,
-            "ICON_LOCATION": data.icon_location.readable,
+            "NameString": get(data, "name_string"),
+            "RELATIVE_PATH": get(data, "relative_path"),
+            "WORKING_DIR": get(data, "working_dir"),
+            "COMMAND_LINE_ARGUMENTS": get(data, "command_line_arguments"),
+            "ICON_LOCATION": get(data, "icon_location"),
         }
+

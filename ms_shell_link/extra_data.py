@@ -291,43 +291,50 @@ class ExtraData:
 
     @staticmethod
     def notionable(cls):
-        blocks = []
+        def _has(name):
+            v = getattr(cls, name, None)
+            try:
+                return len(v) > 0
+            except Exception:
+                return bool(v)
 
-        if len(cls.console_data_block) > 0:
-            blocks.append("01_ConsoleDataBlock")
-        if len(cls.console_fe_data_block) > 0:
-            blocks.append("02_ConsoleFEDataBlock")
-        if len(cls.darwin_data_block) > 0:
-            blocks.append("03_DarwinDataBlock")
-        if len(cls.environment_variable_data_block) > 0:
-            blocks.append("04_EnvironmentVariableDataBlock")
-        if len(cls.icon_environment_data_block) > 0:
-            blocks.append("05_IconEnvironmentDataBlock")
-        if len(cls.known_folder_data_block) > 0:
-            blocks.append("06_KnownFolderDataBlock")
-        if len(cls.property_store_data_block) > 0:
-            blocks.append("07_PropertyStoreDataBlock")
-        if len(cls.shim_data_block) > 0:
-            blocks.append("08_ShimDataBlock")
-        if len(cls.special_folder_data_block) > 0:
-            blocks.append("09_SpecialFolderDataBlock")
-        if len(cls.tracker_data_block) > 0:
-            blocks.append("10_TrackerDataBlock")
-        if  len(cls.vista_and_above_id_list_data_block) > 0:
-            blocks.append("11_VistaAndAboveIDListDataBlock")
+        def _as_list(v):
+            if isinstance(v, (list, tuple)):
+                return v
+            return [] if v is None else [v]
 
-        tracker = cls.tracker_data_block[0]
+        def _empty(x):
+            return '' if x in (None, '', [], {}, ()) else x
 
-        result = {
+        blocks_map = [
+            ("console_data_block", "01_ConsoleDataBlock"),
+            ("console_fe_data_block", "02_ConsoleFEDataBlock"),
+            ("darwin_data_block", "03_DarwinDataBlock"),
+            ("environment_variable_data_block", "04_EnvironmentVariableDataBlock"),
+            ("icon_environment_data_block", "05_IconEnvironmentDataBlock"),
+            ("known_folder_data_block", "06_KnownFolderDataBlock"),
+            ("property_store_data_block", "07_PropertyStoreDataBlock"),
+            ("shim_data_block", "08_ShimDataBlock"),
+            ("special_folder_data_block", "09_SpecialFolderDataBlock"),
+            ("tracker_data_block", "10_TrackerDataBlock"),
+            ("vista_and_above_id_list_data_block", "11_VistaAndAboveIDListDataBlock"),
+        ]
+
+        blocks = [label for name, label in blocks_map if _has(name)]
+
+        tracker_list = _as_list(getattr(cls, "tracker_data_block", None))
+        tracker = tracker_list[0] if tracker_list else None
+
+        return {
             "DataBlocks": blocks,
-            "MachineID": tracker.machine_id,
-            "MacAddress": tracker.mac_address,
-            "FileDroid": tracker.droid_file,
-            "VolumeDroid": tracker.droid_volume,
-            "FileDroidBirth": tracker.droid_birth_file,
-            "VolumeDroidBirth": tracker.droid_birth_volume,
+            "MachineID": _empty(getattr(tracker, "machine_id", None)),
+            "MacAddress": _empty(getattr(tracker, "mac_address", None)),
+            "FileDroid": _empty(getattr(tracker, "droid_file", None)),
+            "VolumeDroid": _empty(getattr(tracker, "droid_volume", None)),
+            "FileDroidBirth": _empty(getattr(tracker, "droid_birth_file", None)),
+            "VolumeDroidBirth": _empty(getattr(tracker, "droid_birth_volume", None)),
         }
-        return result
+
 
 def __check_signature(signature: bytes) -> str:
     flags, = struct.unpack("<I", signature)

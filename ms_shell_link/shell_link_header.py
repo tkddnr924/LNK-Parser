@@ -1,4 +1,4 @@
-from utils import windows_filetime_to_str
+from utils import windows_filetime_to_str, _empty
 import struct
 
 LINK_FLAGS = {
@@ -120,16 +120,16 @@ class ShellLinkHeader:
 
     @staticmethod
     def notionable(header):
-
+        _fa = getattr(header, 'file_attributes_readable', None)
         result = {
-            "LinkFlags": header.link_flags_readable,
-            "FileAttributes": header.file_attributes_readable[0],
-            "CreationTime": header.ct_readable,
-            "AccessTime": header.at_readable,
-            "WriteTime": header.wt_readable,
-            "FileSize": header.file_size_readable,
-            "IconIndex": header.icon_index_readable,
-            "ShowCommand": header.show_command_readable,
+            "LinkFlags": _empty(getattr(header, 'link_flags_readable', None)),
+            "FileAttributes": _empty(_fa[0] if isinstance(_fa, (list, tuple)) and _fa else ''),
+            "CreationTime": _empty(getattr(header, 'ct_readable', None)),
+            "AccessTime": _empty(getattr(header, 'at_readable', None)),
+            "WriteTime": _empty(getattr(header, 'wt_readable', None)),
+            "FileSize": _empty(getattr(header, 'file_size_readable', None)),
+            "IconIndex": _empty(getattr(header, 'icon_index_readable', None)),
+            "ShowCommand": _empty(getattr(header, 'show_command_readable', None)),
         }
 
         return result
